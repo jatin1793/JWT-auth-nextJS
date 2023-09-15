@@ -15,10 +15,11 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
-
 mongoose.connect('mongodb://127.0.0.1:27017/instanextJSapp')
 .then(console.log("DB connected"))
 .catch(err => console.log(err))
+
+
 
 app.post('/auth/register', async (req, res) => {
     const { email, name, username, password } = req.body;
@@ -50,7 +51,6 @@ app.post('/auth/login', async (req, res) => {
             const passCheck = bcrypt.compareSync(password, user.password)
             if (passCheck) {
                 const JWT_token = jwt.sign({ userId: user._id }, secret);
-                console.log(JWT_token, user.email)
                 User.findOneAndUpdate({email: user.email}, {token: JWT_token})
                 .then(()=>{})
                 .catch((err)=>{console.log(err)})
@@ -65,6 +65,16 @@ app.post('/auth/login', async (req, res) => {
     }
 })
 
+app.get("/hello/home", async (req, res) => {
+    try{
+        var user = User.findOne({ username: req.params.username })
+        console.log(user)
+        res.json({user})
+    }
+    catch(err){
+        console.log(err)
+    }
+})
 
 app.listen(3001, () => {
     console.log('Server is running on port 3001');
